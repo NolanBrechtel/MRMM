@@ -1,8 +1,6 @@
 use std::path::{Path, PathBuf};
-use egui::Image;
-use image::{DynamicImage, GenericImageView};
+use image::DynamicImage;
 use serde_json;
-use serde::Deserialize;
 
 #[derive(Debug, Default, Clone, serde::Deserialize, serde::Serialize)]
 pub struct Modification {
