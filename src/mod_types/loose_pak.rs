@@ -2,9 +2,9 @@ use std::path::PathBuf;
 
 #[derive(Debug, Default)]
 pub struct LoosePak {
-    name: String,
-    path: PathBuf,
-    enabled: bool,
+    pub name: String,
+    pub path: PathBuf,
+    pub enabled: bool,
 }
 impl LoosePak {
     fn new() -> Self {
@@ -15,7 +15,7 @@ impl LoosePak {
         pak.name = path.file_name().unwrap().to_str().unwrap().to_string();
         pak.path = path;
         pak.enabled = false;
-        return Ok(pak)
+        return Ok(pak);
     }
     pub fn path(&self) -> &PathBuf {
         &self.path

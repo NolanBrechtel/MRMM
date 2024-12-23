@@ -1,17 +1,17 @@
-use std::path::PathBuf;
 use serde_json;
+use std::path::PathBuf;
 
 #[derive(Debug, Default, Clone, serde::Deserialize, serde::Serialize)]
 pub struct Modification {
-    name: String,
-    description: String,
-    author: String,
-    version: String,
-    images: Vec<PathBuf>,
+    pub name: String,
+    pub description: String,
+    pub author: String,
+    pub version: String,
+    pub images: Vec<PathBuf>,
     #[serde(skip)]
-    file_path: PathBuf,
+    pub file_path: PathBuf,
     #[serde(skip)]
-    enabled: bool,
+    pub enabled: bool,
 }
 impl Modification {
     pub fn new() -> Self {
@@ -22,7 +22,7 @@ impl Modification {
         for entry in entries {
             let entry = entry.unwrap();
             let path = entry.path();
-            if path.ends_with(".pak") {
+            if path.to_str().unwrap().ends_with(".pak") {
                 return path;
             }
         }

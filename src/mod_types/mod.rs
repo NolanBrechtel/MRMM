@@ -1,11 +1,11 @@
-mod modification;
 mod loose_pak;
+mod modification;
 pub(crate) mod multi_pak;
 
-use std::fmt::Debug;
-pub use modification::*;
 pub use loose_pak::*;
+pub use modification::*;
 pub use multi_pak::*;
+use std::fmt::Debug;
 pub enum ModType {
     Complete(Modification),
     LoosePak(LoosePak),

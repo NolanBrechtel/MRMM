@@ -1,9 +1,9 @@
-use std::path::PathBuf;
 use serde::Deserialize;
 use serde::Serialize;
+use std::path::PathBuf;
 
 #[derive(Debug, Deserialize, Serialize)]
-struct Pak {
+pub struct Pak {
     pub name: String,
     pub description: String,
     pub images: Vec<PathBuf>,
@@ -13,17 +13,17 @@ struct Pak {
 }
 #[derive(Debug, Default, Deserialize, Serialize)]
 pub struct MultiPak {
-    author: String,
-    description: String,
-    version: String,
-    name: String,
-    paks: Vec<Pak>,
+    pub author: String,
+    pub description: String,
+    pub version: String,
+    pub name: String,
+    pub paks: Vec<Pak>,
     #[serde(skip)]
-    enabled: bool,
+    pub enabled: bool,
     #[serde(skip)]
-    path: PathBuf,
+    pub path: PathBuf,
     #[serde(skip)]
-    selected_pak: usize,
+    pub selected_pak: usize,
 }
 
 impl MultiPak {
@@ -33,7 +33,7 @@ impl MultiPak {
         let multi_pak: Result<MultiPak, serde_json::Error> = serde_json::from_str(&json_content);
         let mut modification = multi_pak.unwrap();
         for pak in &mut modification.paks {
-            pak.path = path.join("paks").join(&pak.name)
+            pak.path = path.join("paks").join(&pak.pak)
         }
         modification.path = path;
         modification.enabled = false;
