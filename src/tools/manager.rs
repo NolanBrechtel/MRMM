@@ -8,11 +8,10 @@ use egui::Context;
 use image::GenericImageView;
 use std::fmt::Debug;
 use std::fs;
-use std::fs::{create_dir_all, File};
+use std::fs::create_dir_all;
 use std::path::{Path, PathBuf};
 use zip::read::ZipArchive;
 use sevenz_rust::decompress_file as decompress_7z;
-use unrar::Archive;
 
 
 
@@ -205,9 +204,6 @@ impl ModManager {
         let parent_dir = file_path
             .parent()
             .ok_or("Unable to determine parent directory.")?;
-        let file_stem = file_path
-            .file_stem()
-            .ok_or("Unable to determine file name stem.")?;
         let output_dir = parent_dir;
 
         // Create the output directory if it doesn't exist
@@ -354,6 +350,7 @@ impl eframe::App for ModManager {
                                 .clicked()
                             {
                                 self.selected_mod_index = Some(index);
+                                self.current_image = 0;
                             }
                         }
                         Complete(cm) => {
