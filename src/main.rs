@@ -39,14 +39,3 @@ fn main() -> eframe::Result {
         Box::new(|_cc| Ok(Box::new(manager))),
     )
 }
-fn load_icon(path: &str) -> Result<Icon, Box<dyn std::error::Error>> {
-    // Load the image from the specified path
-    let img = image::ImageReader::open(Path::new(path))?
-        .with_guessed_format()?
-        .decode()?
-        .to_rgba8();
-
-    let (width, height) = img.dimensions();
-    let rgba = img.into_raw();
-    Ok(Icon::from_rgba(rgba, width, height)?)
-}
