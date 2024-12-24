@@ -6,6 +6,7 @@ pub use loose_pak::*;
 pub use modification::*;
 pub use multi_pak::*;
 use std::fmt::Debug;
+
 pub enum ModType {
     Complete(Modification),
     LoosePak(LoosePak),

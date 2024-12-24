@@ -10,6 +10,7 @@ use std::fmt::Debug;
 use std::fs;
 use std::fs::create_dir_all;
 use std::path::{Path, PathBuf};
+use std::process::Command;
 use zip::read::ZipArchive;
 use sevenz_rust::decompress_file as decompress_7z;
 
@@ -19,7 +20,7 @@ use sevenz_rust::decompress_file as decompress_7z;
 pub struct ModManager {
     modifications: Vec<ModType>,
     pub mod_directory: PathBuf,
-    game_directory: PathBuf,
+    pub game_directory: PathBuf,
     mod_load_status: String,
     selected_mod_index: Option<usize>,
     current_image: usize,
@@ -251,9 +252,20 @@ impl ModManager {
         Ok(())
     }
 }
-
+// TODO: Add enaable all/disable all option
 impl eframe::App for ModManager {
     fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
+        egui::TopBottomPanel::top("top_bar").show(ctx, |ui| {
+            // Set a horizontal layout and align items to the right
+            ui.horizontal(|ui| {
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    if ui.button("Github").clicked() {
+                        // Button clicked logic
+                        open::that("https://github.com/NolanBrechtel/MRMM").expect("Failed to open Github");
+                    }
+                });
+            });
+        });
         egui::CentralPanel::default().show(ctx, |ui| {
             if !ctx.input(|i| i.raw.dropped_files.is_empty()) {
                 // Get the files that were dropped into the window
@@ -334,7 +346,40 @@ impl eframe::App for ModManager {
             });
             ui.separator();
             ui.columns(2, |columns| {
-                columns[0].heading("Available Mods");
+                columns[0].horizontal(|ui|{
+                    ui.heading("Available Mods");
+                    if ui.button("Enable All").clicked() {
+                        for modification in self.modifications.iter_mut(){
+                            match modification {
+                                LoosePak(ref mut lp)=>{
+                                    lp.enabled = true;
+                                }
+                                Complete(ref mut cm) => {
+                                    cm.enabled = true;
+                                }
+                                MultiPak(ref mut mp) => {
+                                    mp.enabled = true;
+                                }
+                            }
+                        }
+                    }
+                    if ui.button("Disable All").clicked() {
+                        for modification in self.modifications.iter_mut(){
+                            match modification {
+                                LoosePak(ref mut lp)=>{
+                                    lp.enabled = false;
+                                }
+                                Complete(ref mut cm) => {
+                                    cm.enabled = false;
+                                }
+                                MultiPak(ref mut mp) => {
+                                    mp.enabled = false;
+                                }
+                            }
+                        }
+                    }
+
+                });
                 for (index, modification) in self.modifications.iter_mut().enumerate() {
                     columns[0].horizontal(|ui| match modification {
                         LoosePak(lp) => {
@@ -361,7 +406,7 @@ impl eframe::App for ModManager {
                             if ui
                                 .selectable_label(
                                     self.selected_mod_index == Some(index),
-                                    format!("{} v{}", cm.name, cm.version),
+                                    format!("{}", cm.name),
                                 )
                                 .clicked()
                             {
@@ -376,7 +421,7 @@ impl eframe::App for ModManager {
                             if ui
                                 .selectable_label(
                                     self.selected_mod_index == Some(index),
-                                    format!("{} v{}", mp.name, mp.version),
+                                    format!("{}", mp.name),
                                 )
                                 .clicked()
                             {
