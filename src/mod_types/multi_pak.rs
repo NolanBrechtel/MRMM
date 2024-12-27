@@ -43,3 +43,15 @@ impl MultiPak {
         &self.paks[self.selected_pak]
     }
 }
+
+impl Pak {
+    pub fn new(pak: String) -> Self {
+        Self {
+            name: "".parse().unwrap(),
+            description: "".to_string(),
+            images: vec![],
+            pak,
+            path: Default::default(),
+        }
+    }
+}
