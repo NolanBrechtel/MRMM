@@ -4,27 +4,15 @@ use crate::mod_types::MultiPak;
 use crate::mod_types::*;
 use eframe::epaint::TextureHandle;
 use eframe::Frame;
-use egui::{Context, ViewportBuilder};
+use egui::{Context};
 use image::GenericImageView;
 use std::fmt::Debug;
-use std::{env, fs};
+use std::{fs};
 use std::fs::create_dir_all;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use zip::read::ZipArchive;
 use sevenz_rust::decompress_file as decompress_7z;
-use crate::tools::ModBuilder;
-
-fn start_mod_builder() -> eframe::Result {
-    let builder: ModBuilder = ModBuilder::new();
-    let native_options = eframe::NativeOptions::default();
-
-    eframe::run_native(
-        "Mod Builder",
-        native_options,
-        Box::new(|_cc| Ok(Box::new(builder))),
-    )
-}
 
 #[derive(Default, Debug)]
 pub struct ModManager {
@@ -39,6 +27,11 @@ pub struct ModManager {
 impl ModManager {
     pub fn new() -> Self {
         Self::default()
+    }
+    pub fn launch(&mut self) {
+        let steam_dir = steamlocate::SteamDir::locate().unwrap();
+        let steam_path = steam_dir.path().join("steam.exe");
+        Command::new(steam_path).arg("steam://rungameid/2767030").spawn().unwrap();
     }
     pub fn validate_game_directory(&self) -> bool {
         if self.game_directory.exists() {
@@ -271,6 +264,9 @@ impl eframe::App for ModManager {
                     if ui.button("Github").clicked() {
                         // Button clicked logic
                         open::that("https://github.com/NolanBrechtel/MRMM").expect("Failed to open Github");
+                    }
+                    if ui.button("Launch Game").clicked() {
+                        self.launch();
                     }
                 });
             });

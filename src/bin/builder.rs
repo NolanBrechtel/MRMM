@@ -1,6 +1,9 @@
+#![windows_subsystem = "windows"]
+
 use std::env;
 use egui::ViewportBuilder;
-use MarvelRivalsModManager::tools::*;
+use marvel_rivals_mod_manager::tools::*;
+
 
 fn main() -> eframe::Result {
     let path_to_icon = env::current_dir().unwrap().join("icon.png");

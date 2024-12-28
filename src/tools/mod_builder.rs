@@ -80,9 +80,6 @@ impl eframe::App for ModBuilder {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             ui.horizontal(|ui| {
-                if ui.button("Debug").clicked() {
-                    println!("{:?}", self);
-                }
                 if ui.button("Build").clicked() {
                     match &self.modification {
                         ModType::Complete(_modification) => {
@@ -175,7 +172,9 @@ impl eframe::App for ModBuilder {
                             } else if filename.ends_with(".pak") {
                                 let destination = self.pak_dir.join(filename);
                                 fs::rename(filepath, destination).unwrap();
-                                modification.paks.push(Pak::new(filename.to_string()));
+                                let mut pak = Pak::new(filename.to_string());
+                                pak.set_name(filename.to_string());
+                                modification.paks.push(pak);
                             }
                         }
                     }
@@ -265,7 +264,7 @@ impl eframe::App for ModBuilder {
                         cols[0].separator();
 
                         if self.pak_dir.exists() {
-                            for mut pak in mp.paks.iter_mut() {
+                            for pak in mp.paks.iter_mut() {
                                 cols[0].heading(format!("Pak {}", pak.pak));
                                 cols[0].horizontal(|ui| {
                                     ui.label("Name: ");

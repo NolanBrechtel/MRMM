@@ -1,5 +1,5 @@
 [package]
-name = "MarvelRivalsModManager"
+name = "marvel_rivals_mod_manager"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,10 +11,8 @@ serde_json = "1.0.133"
 serde = { version = "1.0.216", features = ["derive"] }
 zip = "2.2.2"
 sevenz-rust = "0.6.1"
-winit = "0.30.7"
 steamlocate = "2.0.0"
 open = "5.3.1"
-walkdir = "2.5.0"
 
 [[bin]]
 name = "Manager"

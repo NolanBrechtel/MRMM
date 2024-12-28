@@ -1,7 +1,9 @@
-use std::env;
+#![windows_subsystem = "windows"]
+
+use std::{env};
 use std::path::PathBuf;
 use egui::ViewportBuilder;
-use MarvelRivalsModManager::tools::*;
+use marvel_rivals_mod_manager::tools::*;
 fn main() -> eframe::Result {
     let mut manager: ModManager = ModManager::new();
     manager.mod_directory = env::current_dir().unwrap().join("mods");
@@ -43,11 +45,11 @@ fn find_game_dir() -> PathBuf {
         let library = library.unwrap();
         println!("{:?}", library);
         for app in library.apps(){
-            let mut app = app.unwrap();
+            let app = app.unwrap();
             if app.app_id == marvel_rivals.app_id{
                 return library.path().join("steamapps").join("common").join(marvel_rivals.install_dir)
             }
         }
     }
-    return PathBuf::new();
+    PathBuf::new()
 }

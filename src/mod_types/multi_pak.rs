@@ -54,4 +54,7 @@ impl Pak {
             path: Default::default(),
         }
     }
+    pub fn set_name(&mut self, name: String) {
+        self.name = name;
+    }
 }
