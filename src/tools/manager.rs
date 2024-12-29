@@ -355,89 +355,92 @@ impl eframe::App for ModManager {
             });
             ui.separator();
             ui.columns(2, |columns| {
-                columns[0].horizontal(|ui| {
-                    ui.heading("Available Mods");
-                    if ui.button("Enable All").clicked() {
-                        for modification in self.modifications.iter_mut() {
-                            match modification {
-                                LoosePak(ref mut lp) => {
-                                    lp.enabled = true;
-                                }
-                                Complete(ref mut cm) => {
-                                    cm.enabled = true;
-                                }
-                                MultiPak(ref mut mp) => {
-                                    mp.enabled = true;
-                                }
-                            }
-                        }
-                    }
-                    if ui.button("Disable All").clicked() {
-                        for modification in self.modifications.iter_mut() {
-                            match modification {
-                                LoosePak(ref mut lp) => {
-                                    lp.enabled = false;
-                                }
-                                Complete(ref mut cm) => {
-                                    cm.enabled = false;
-                                }
-                                MultiPak(ref mut mp) => {
-                                    mp.enabled = false;
+                egui::ScrollArea::vertical().max_height(columns[0].available_height()).show(&mut columns[0], |ui| {
+                    ui.horizontal(|ui| {
+                        ui.heading("Available Mods");
+                        if ui.button("Enable All").clicked() {
+                            for modification in self.modifications.iter_mut() {
+                                match modification {
+                                    LoosePak(ref mut lp) => {
+                                        lp.enabled = true;
+                                    }
+                                    Complete(ref mut cm) => {
+                                        cm.enabled = true;
+                                    }
+                                    MultiPak(ref mut mp) => {
+                                        mp.enabled = true;
+                                    }
                                 }
                             }
                         }
-                    }
-                });
-                for (index, modification) in self.modifications.iter_mut().enumerate() {
-                    columns[0].horizontal(|ui| match modification {
-                        LoosePak(lp) => {
-                            let mut enabled = lp.enabled;
-                            if ui.checkbox(&mut enabled, "").changed() {
-                                lp.enabled = enabled;
-                            }
-                            if ui
-                                .selectable_label(
-                                    self.selected_mod_index == Some(index),
-                                    format!("{}", lp.name),
-                                )
-                                .clicked()
-                            {
-                                self.selected_mod_index = Some(index);
-                                self.current_image = 0;
-                            }
-                        }
-                        Complete(cm) => {
-                            let mut enabled = cm.enabled;
-                            if ui.checkbox(&mut enabled, "").changed() {
-                                cm.enabled = enabled;
-                            }
-                            if ui
-                                .selectable_label(
-                                    self.selected_mod_index == Some(index),
-                                    format!("{}", cm.name),
-                                )
-                                .clicked()
-                            {
-                                self.selected_mod_index = Some(index);
-                            }
-                        }
-                        MultiPak(mp) => {
-                            let mut enabled = mp.enabled;
-                            if ui.checkbox(&mut enabled, "").changed() {
-                                mp.enabled = enabled;
-                            }
-                            if ui
-                                .selectable_label(
-                                    self.selected_mod_index == Some(index),
-                                    format!("{}", mp.name),
-                                )
-                                .clicked()
-                            {
-                                self.selected_mod_index = Some(index);
+                        if ui.button("Disable All").clicked() {
+                            for modification in self.modifications.iter_mut() {
+                                match modification {
+                                    LoosePak(ref mut lp) => {
+                                        lp.enabled = false;
+                                    }
+                                    Complete(ref mut cm) => {
+                                        cm.enabled = false;
+                                    }
+                                    MultiPak(ref mut mp) => {
+                                        mp.enabled = false;
+                                    }
+                                }
                             }
                         }
                     });
-                }
+                    for (index, modification) in self.modifications.iter_mut().enumerate() {
+                        ui.horizontal(|ui| match modification {
+                            LoosePak(lp) => {
+                                let mut enabled = lp.enabled;
+                                if ui.checkbox(&mut enabled, "").changed() {
+                                    lp.enabled = enabled;
+                                }
+                                if ui
+                                    .selectable_label(
+                                        self.selected_mod_index == Some(index),
+                                        format!("{}", lp.name),
+                                    )
+                                    .clicked()
+                                {
+                                    self.selected_mod_index = Some(index);
+                                    self.current_image = 0;
+                                }
+                            }
+                            Complete(cm) => {
+                                let mut enabled = cm.enabled;
+                                if ui.checkbox(&mut enabled, "").changed() {
+                                    cm.enabled = enabled;
+                                }
+                                if ui
+                                    .selectable_label(
+                                        self.selected_mod_index == Some(index),
+                                        format!("{}", cm.name),
+                                    )
+                                    .clicked()
+                                {
+                                    self.selected_mod_index = Some(index);
+                                }
+                            }
+                            MultiPak(mp) => {
+                                let mut enabled = mp.enabled;
+                                if ui.checkbox(&mut enabled, "").changed() {
+                                    mp.enabled = enabled;
+                                }
+                                if ui
+                                    .selectable_label(
+                                        self.selected_mod_index == Some(index),
+                                        format!("{}", mp.name),
+                                    )
+                                    .clicked()
+                                {
+                                    self.selected_mod_index = Some(index);
+                                }
+                            }
+                        });
+                    }
+                });
+
                 columns[1].heading("Mod Details:");
                 if let Some(selected_index) = self.selected_mod_index {
                     let selected_mod = self.modifications.get_mut(selected_index).unwrap();
