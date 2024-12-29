@@ -1,15 +1,13 @@
 #![windows_subsystem = "windows"]
 
-use std::env;
 use egui::ViewportBuilder;
 use marvel_rivals_mod_manager::tools::*;
-
+use std::env;
 
 fn main() -> eframe::Result {
     let path_to_icon = env::current_dir().unwrap().join("icon.png");
 
     let loaded_icon = image::open(path_to_icon).unwrap();
-
 
     let native_options = eframe::NativeOptions {
         viewport: ViewportBuilder {

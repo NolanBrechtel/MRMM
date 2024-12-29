@@ -1,9 +1,9 @@
-use std::{env, fs};
+use crate::mod_types::{ModType, Modification, MultiPak, Pak};
+use egui::text_edit;
 use std::fs::{rename, File};
 use std::io::Write;
 use std::path::PathBuf;
-use egui::text_edit;
-use crate::mod_types::{ModType, Modification, MultiPak, Pak};
+use std::{env, fs};
 
 #[derive(Debug)]
 pub struct ModBuilder {
@@ -13,7 +13,6 @@ pub struct ModBuilder {
     img_dir: PathBuf,
     pak_dir: PathBuf,
     modification: ModType,
-
 }
 
 fn toggle(ui: &mut egui::Ui, on: &mut bool) -> egui::Response {
@@ -94,11 +93,15 @@ impl eframe::App for ModBuilder {
                         ModType::Complete(modification) => {
                             match serde_json::to_string_pretty(&modification) {
                                 Ok(json) => {
-                                    if !modification.name.is_empty(){
+                                    if !modification.name.is_empty() {
                                         let mut file = File::create("temp/mod.json").unwrap();
                                         file.write_all(json.as_bytes()).unwrap();
                                         drop(file);
-                                        rename(&self.temp_dir.as_path(), &self.working_dir.join(&modification.name)).unwrap();
+                                        rename(
+                                            &self.temp_dir.as_path(),
+                                            &self.working_dir.join(&modification.name),
+                                        )
+                                        .unwrap();
                                     }
                                 }
                                 Err(e) => eprintln!("{}", e),
@@ -107,11 +110,15 @@ impl eframe::App for ModBuilder {
                         ModType::MultiPak(modification) => {
                             match serde_json::to_string_pretty(&modification) {
                                 Ok(json) => {
-                                    if !modification.name.is_empty(){
+                                    if !modification.name.is_empty() {
                                         let mut file = File::create("temp/mod.json").unwrap();
                                         file.write_all(json.as_bytes()).unwrap();
                                         drop(file);
-                                        rename(&self.temp_dir.as_path(), &self.working_dir.join(&modification.name)).unwrap();
+                                        rename(
+                                            &self.temp_dir.as_path(),
+                                            &self.working_dir.join(&modification.name),
+                                        )
+                                        .unwrap();
                                     }
                                 }
                                 Err(e) => eprintln!("{}", e),
@@ -150,6 +157,7 @@ impl eframe::App for ModBuilder {
                                 fs::rename(filepath, destination).unwrap();
                                 modification.images.push(PathBuf::from(filename));
                             } else if filename.ends_with(".pak") {
+                                modification.name = filename.to_string();
                                 let destination = self.working_dir.join("temp").join(filename);
                                 fs::rename(filepath, destination).unwrap();
                             }
@@ -194,113 +202,149 @@ impl eframe::App for ModBuilder {
                         println!("Switch to MultiPak");
                         self.modification = ModType::MultiPak(MultiPak::default());
                         self.check_dirs_complete();
-                        fs::remove_dir_all(&self.working_dir.join("temp")).expect("failed to find temp dir");
+                        fs::remove_dir_all(&self.working_dir.join("temp"))
+                            .expect("failed to find temp dir");
                     } else {
                         println!("Switch to Single Pak");
                         self.modification = ModType::Complete(Modification::new());
                         self.check_dirs_complete();
-                        fs::remove_dir_all(&self.working_dir.join("temp")).expect("failed to find temp dir");
+                        fs::remove_dir_all(&self.working_dir.join("temp"))
+                            .expect("failed to find temp dir");
                     }
                 }
                 ui.label("MultiPak Mod");
             });
             ui.separator();
-            ui.columns(2, |cols| {
-                match &mut self.modification {
-                    ModType::Complete(ref mut cm) => {
-                        cols[0].label("Drag and drop .pak and image files on this window to add them to the mod.");
-                        cols[0].horizontal(|ui| {
-                            ui.label("Name: ");
-                            if ui.add(text_edit::TextEdit::singleline(&mut cm.name)).changed() {
-                                println!("{}", cm.name);
-                            }
-                        });
-                        cols[0].horizontal(|ui| {
-                            ui.label("Description: ");
-                            if ui.add(text_edit::TextEdit::singleline(&mut cm.description)).changed() {
-                                println!("{}", cm.description);
-                            }
-                        });
-                        cols[0].horizontal(|ui| {
-                            ui.label("Author: ");
-                            if ui.add(text_edit::TextEdit::singleline(&mut cm.author)).changed() {
-                                println!("{}", cm.author);
-                            }
-                        });
-                        cols[0].horizontal(|ui| {
-                            ui.label("Version: ");
-                            if ui.add(text_edit::TextEdit::singleline(&mut cm.version)).changed() {
-                                println!("{}", cm.version);
-                            }
-                        });
-                    }
-                    ModType::MultiPak(mp) => {
-                        cols[0].label("Drag and drop .pak files on this window to add them to the mod.");
-                        cols[0].horizontal(|ui| {
-                            ui.label("Name: ");
-                            if ui.add(text_edit::TextEdit::singleline(&mut mp.name)).changed() {
-                                println!("{}", mp.name);
-                            }
-                        });
-                        cols[0].horizontal(|ui| {
-                            ui.label("Description: ");
-                            if ui.add(text_edit::TextEdit::singleline(&mut mp.description)).changed() {
-                                println!("{}", mp.description);
-                            }
-                        });
-                        cols[0].horizontal(|ui| {
-                            ui.label("Author: ");
-                            if ui.add(text_edit::TextEdit::singleline(&mut mp.author)).changed() {
-                                println!("{}", mp.author);
-                            }
-                        });
-                        cols[0].horizontal(|ui| {
-                            ui.label("Version: ");
-                            if ui.add(text_edit::TextEdit::singleline(&mut mp.version)).changed() {
-                                println!("{}", mp.version);
-                            }
-                        });
-                        cols[0].heading("Paks:");
-                        cols[0].separator();
+            match &mut self.modification {
+                ModType::Complete(ref mut cm) => {
+                    ui.label(
+                        "Drag and drop .pak and image files on this window to add them to the mod.",
+                    );
+                    ui.horizontal(|ui| {
+                        ui.label("Name: ");
+                        if ui
+                            .add(text_edit::TextEdit::singleline(&mut cm.name))
+                            .changed()
+                        {
+                            println!("{}", cm.name);
+                        }
+                    });
+                    ui.horizontal(|ui| {
+                        ui.label("Description: ");
+                        if ui
+                            .add(text_edit::TextEdit::singleline(&mut cm.description))
+                            .changed()
+                        {
+                            println!("{}", cm.description);
+                        }
+                    });
+                    ui.horizontal(|ui| {
+                        ui.label("Author: ");
+                        if ui
+                            .add(text_edit::TextEdit::singleline(&mut cm.author))
+                            .changed()
+                        {
+                            println!("{}", cm.author);
+                        }
+                    });
+                    ui.horizontal(|ui| {
+                        ui.label("Version: ");
+                        if ui
+                            .add(text_edit::TextEdit::singleline(&mut cm.version))
+                            .changed()
+                        {
+                            println!("{}", cm.version);
+                        }
+                    });
+                }
+                ModType::MultiPak(mp) => {
+                    ui.label("Drag and drop .pak files on this window to add them to the mod.");
+                    ui.horizontal(|ui| {
+                        ui.label("Name: ");
+                        if ui
+                            .add(text_edit::TextEdit::singleline(&mut mp.name))
+                            .changed()
+                        {
+                            println!("{}", mp.name);
+                        }
+                    });
+                    ui.horizontal(|ui| {
+                        ui.label("Description: ");
+                        if ui
+                            .add(text_edit::TextEdit::singleline(&mut mp.description))
+                            .changed()
+                        {
+                            println!("{}", mp.description);
+                        }
+                    });
+                    ui.horizontal(|ui| {
+                        ui.label("Author: ");
+                        if ui
+                            .add(text_edit::TextEdit::singleline(&mut mp.author))
+                            .changed()
+                        {
+                            println!("{}", mp.author);
+                        }
+                    });
+                    ui.horizontal(|ui| {
+                        ui.label("Version: ");
+                        if ui
+                            .add(text_edit::TextEdit::singleline(&mut mp.version))
+                            .changed()
+                        {
+                            println!("{}", mp.version);
+                        }
+                    });
+                    ui.heading("Paks:");
+                    ui.separator();
 
-                        if self.pak_dir.exists() {
-                            for pak in mp.paks.iter_mut() {
-                                cols[0].heading(format!("Pak {}", pak.pak));
-                                cols[0].horizontal(|ui| {
-                                    ui.label("Name: ");
-                                    if ui.add(text_edit::TextEdit::singleline(&mut pak.name)).changed() {
-                                        println!("{}", pak.name);
-                                    }
-                                });
-                                cols[0].horizontal(|ui| {
-                                    ui.label("Description: ");
-                                    if ui.add(text_edit::TextEdit::singleline(&mut pak.description)).changed() {
-                                        println!("{}", pak.description);
-                                    }
-                                });
-                                cols[0].label("Choose images to be associated with .pak: ");
-                                for image in self.img_dir.read_dir().unwrap() {
-                                    let image = PathBuf::from(image.unwrap().file_name().to_str().unwrap());
-                                    cols[0].horizontal(|ui| {
-                                        ui.label(image.to_str().unwrap());
-                                        let mut is_selected = pak.images.contains(&image);
-                                        if ui.checkbox(&mut is_selected, &*image.to_str().unwrap()).clicked() {
-                                            if is_selected{
-                                                pak.images.push(PathBuf::from(image));
-                                            } else {
-                                                pak.images.retain(|p| p.to_str() != image.to_str());
-                                            }
-                                        }
-                                    });
+                    if self.pak_dir.exists() {
+                        for pak in mp.paks.iter_mut() {
+                            ui.heading(format!("Pak {}", pak.pak));
+                            ui.horizontal(|ui| {
+                                ui.label("Name: ");
+                                if ui
+                                    .add(text_edit::TextEdit::singleline(&mut pak.name))
+                                    .changed()
+                                {
+                                    println!("{}", pak.name);
                                 }
+                            });
+                            ui.horizontal(|ui| {
+                                ui.label("Description: ");
+                                if ui
+                                    .add(text_edit::TextEdit::singleline(&mut pak.description))
+                                    .changed()
+                                {
+                                    println!("{}", pak.description);
+                                }
+                            });
+                            ui.label("Choose images to be associated with .pak: ");
+                            for image in self.img_dir.read_dir().unwrap() {
+                                let image =
+                                    PathBuf::from(image.unwrap().file_name().to_str().unwrap());
+                                ui.horizontal(|ui| {
+                                    ui.label(image.to_str().unwrap());
+                                    let mut is_selected = pak.images.contains(&image);
+                                    if ui
+                                        .checkbox(&mut is_selected, &*image.to_str().unwrap())
+                                        .clicked()
+                                    {
+                                        if is_selected {
+                                            pak.images.push(PathBuf::from(image));
+                                        } else {
+                                            pak.images.retain(|p| p.to_str() != image.to_str());
+                                        }
+                                    }
+                                });
                             }
                         }
                     }
-                    _ => {
-                        eprintln!("Unknown ModType");
-                    }
                 }
-            });
+                _ => {
+                    eprintln!("Unknown ModType");
+                }
+            }
         });
     }
 }

@@ -15,9 +15,9 @@ steamlocate = "2.0.0"
 open = "5.3.1"
 
 [[bin]]
-name = "Manager"
+name = "ModManager"
 path = "src/bin/mod_manager.rs"
 
 [[bin]]
-name = "Builder"
+name = "ModPackager"
 path = "src/bin/builder.rs"

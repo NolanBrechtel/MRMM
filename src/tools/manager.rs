@@ -4,15 +4,15 @@ use crate::mod_types::MultiPak;
 use crate::mod_types::*;
 use eframe::epaint::TextureHandle;
 use eframe::Frame;
-use egui::{Context};
+use egui::Context;
 use image::GenericImageView;
+use sevenz_rust::decompress_file as decompress_7z;
 use std::fmt::Debug;
-use std::{fs};
+use std::fs;
 use std::fs::create_dir_all;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use zip::read::ZipArchive;
-use sevenz_rust::decompress_file as decompress_7z;
 
 #[derive(Default, Debug)]
 pub struct ModManager {
@@ -31,7 +31,10 @@ impl ModManager {
     pub fn launch(&mut self) {
         let steam_dir = steamlocate::SteamDir::locate().unwrap();
         let steam_path = steam_dir.path().join("steam.exe");
-        Command::new(steam_path).arg("steam://rungameid/2767030").spawn().unwrap();
+        Command::new(steam_path)
+            .arg("steam://rungameid/2767030")
+            .spawn()
+            .unwrap();
     }
     pub fn validate_game_directory(&self) -> bool {
         if self.game_directory.exists() {
@@ -263,7 +266,8 @@ impl eframe::App for ModManager {
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     if ui.button("Github").clicked() {
                         // Button clicked logic
-                        open::that("https://github.com/NolanBrechtel/MRMM").expect("Failed to open Github");
+                        open::that("https://github.com/NolanBrechtel/MRMM")
+                            .expect("Failed to open Github");
                     }
                     if ui.button("Launch Game").clicked() {
                         self.launch();
@@ -351,12 +355,12 @@ impl eframe::App for ModManager {
             });
             ui.separator();
             ui.columns(2, |columns| {
-                columns[0].horizontal(|ui|{
+                columns[0].horizontal(|ui| {
                     ui.heading("Available Mods");
                     if ui.button("Enable All").clicked() {
-                        for modification in self.modifications.iter_mut(){
+                        for modification in self.modifications.iter_mut() {
                             match modification {
-                                LoosePak(ref mut lp)=>{
+                                LoosePak(ref mut lp) => {
                                     lp.enabled = true;
                                 }
                                 Complete(ref mut cm) => {
@@ -369,9 +373,9 @@ impl eframe::App for ModManager {
                         }
                     }
                     if ui.button("Disable All").clicked() {
-                        for modification in self.modifications.iter_mut(){
+                        for modification in self.modifications.iter_mut() {
                             match modification {
-                                LoosePak(ref mut lp)=>{
+                                LoosePak(ref mut lp) => {
                                     lp.enabled = false;
                                 }
                                 Complete(ref mut cm) => {
@@ -383,7 +387,6 @@ impl eframe::App for ModManager {
                             }
                         }
                     }
-
                 });
                 for (index, modification) in self.modifications.iter_mut().enumerate() {
                     columns[0].horizontal(|ui| match modification {
@@ -525,12 +528,14 @@ impl eframe::App for ModManager {
                                     }
                                     // Right arrow to navigate to the next image
                                     if ui.button("➡").clicked() {
-                                        self.current_image =
-                                            (self.current_image + 1) % mp.selected_pak().images.len();
+                                        self.current_image = (self.current_image + 1)
+                                            % mp.selected_pak().images.len();
                                     }
                                 });
                                 // Display the current image
-                                if let Some(image_path) = mp.selected_pak().images.get(self.current_image) {
+                                if let Some(image_path) =
+                                    mp.selected_pak().images.get(self.current_image)
+                                {
                                     // Dynamically load the image as a texture
                                     if let Some(texture) = Self::load_image_to_texture(
                                         ctx,
